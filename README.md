@@ -56,3 +56,12 @@ Options:
 - `./goptimize -m 800x800 *` - optimize and downscale all image files to a maximum size of 800x800px
 - `./goptimize -m 1200x0 image.jpg` - optimize and downscale a JPG file to a maximum size of width of 1200px
 - `./goptimize -o out/ image.jpg` - optimize a JPG file and save it to `out/`
+
+
+
+## TODO
+
+Some ideas for the future:
+
+- Dry run
+- Option to copy exif data (how?)
