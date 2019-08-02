@@ -88,7 +88,7 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Printf("Updated %s to version %s", os.Args[0], rel)
+		fmt.Printf("Updated %s to version %s\n", os.Args[0], rel)
 		return
 	}
 
