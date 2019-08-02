@@ -45,6 +45,8 @@ Options:
         pngquant binary (default "pngquant")
   -q int
         quality - JPEG only (default 75)
+  -u    update to latest release
+  -v    show version number
 ```
 
 
