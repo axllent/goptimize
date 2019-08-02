@@ -25,7 +25,7 @@ var (
 func main() {
 	// set the default help
 	flag.Usage = func() {
-		fmt.Println("Goptimize - downscales and optimizes existing images")
+		fmt.Println("Goptimize - downscales and optimizes images")
 		fmt.Printf("\nUsage: %s [options] <images>\n", os.Args[0])
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
@@ -45,10 +45,10 @@ func main() {
 
 	var maxSizes string
 
-	flag.IntVar(&quality, "q", 75, "Quality - JPEG only")
-	flag.StringVar(&outputDir, "o", "", "Output directory (default overwrites original)")
-	flag.BoolVar(&preserveModificationTimes, "p", true, "Preserve file modification times")
-	flag.StringVar(&maxSizes, "m", "", "Downscale to a maximum width & height in pixels (<width>x<height>)")
+	flag.IntVar(&quality, "q", 75, "quality - JPEG only")
+	flag.StringVar(&outputDir, "o", "", "output directory (default overwrites original)")
+	flag.BoolVar(&preserveModificationTimes, "p", true, "preserve file modification times")
+	flag.StringVar(&maxSizes, "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
 
 	// third-party optimizers
 	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
