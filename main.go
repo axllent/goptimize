@@ -7,19 +7,22 @@ import (
 	"os/exec"
 	"regexp"
 	"strconv"
+
+	"github.com/axllent/gitrel"
 )
 
 var (
-	quality                   int
-	maxWidth                  int
-	maxHeight                 int
-	outputDir                 string
-	preserveModificationTimes bool
-	jpegoptim                 string
-	jpegtran                  string
-	optipng                   string
-	pngquant                  string
-	gifsicle                  string
+	quality          int
+	maxWidth         int
+	maxHeight        int
+	outputDir        string
+	preserveModTimes bool
+	jpegoptim        string
+	jpegtran         string
+	optipng          string
+	pngquant         string
+	gifsicle         string
+	version          = "dev"
 )
 
 func main() {
@@ -44,11 +47,14 @@ func main() {
 	}
 
 	var maxSizes string
+	var update, showversion bool
 
 	flag.IntVar(&quality, "q", 75, "quality - JPEG only")
 	flag.StringVar(&outputDir, "o", "", "output directory (default overwrites original)")
-	flag.BoolVar(&preserveModificationTimes, "p", true, "preserve file modification times")
+	flag.BoolVar(&preserveModTimes, "p", true, "preserve file modification times")
 	flag.StringVar(&maxSizes, "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
+	flag.BoolVar(&update, "u", false, "update to latest release")
+	flag.BoolVar(&showversion, "v", false, "show version number")
 
 	// third-party optimizers
 	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
@@ -67,9 +73,28 @@ func main() {
 	optipng, _ = exec.LookPath(optipng)
 	pngquant, _ = exec.LookPath(pngquant)
 
+	if showversion {
+		fmt.Println(fmt.Sprintf("Version: %s", version))
+		latest, _, _, err := gitrel.Latest("axllent/goptimize", "goptimize")
+		if err == nil && latest != version {
+			fmt.Printf("Update available: %s\nRun `%s -u` to update.\n", latest, os.Args[0])
+		}
+		return
+	}
+
+	if update {
+		rel, err := gitrel.Update("axllent/goptimize", "goptimize", version)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Printf("Updated %s to version %s", os.Args[0], rel)
+		return
+	}
+
 	if len(flag.Args()) < 1 {
 		flag.Usage()
-		return
+		os.Exit(1)
 	}
 
 	if maxSizes != "" {
@@ -79,7 +104,7 @@ func main() {
 
 		if len(matches) != 4 {
 			flag.Usage()
-			return
+			os.Exit(1)
 		}
 
 		maxWidth, _ = strconv.Atoi(matches[1])
@@ -95,7 +120,7 @@ func main() {
 			err := os.MkdirAll(outputDir, os.ModePerm)
 			if err != nil {
 				fmt.Printf("Cannot create output directory: %s\n", outputDir)
-				return
+				os.Exit(1)
 			}
 		}
 	}
@@ -109,7 +134,6 @@ func main() {
 func displayDelectedOptimizer(name, bin string) error {
 	exe, err := exec.LookPath(bin)
 	if err != nil {
-		// fmt.Printf("  - %s: [undetected]\n", name)
 		return err
 	}
 

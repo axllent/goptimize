@@ -170,7 +170,7 @@ func Goptimize(file string) {
 			return
 		}
 
-		if preserveModificationTimes {
+		if preserveModTimes {
 			// transfer original modification times
 			if err := os.Chtimes(dstFile, atime, mtime); err != nil {
 				fmt.Printf("Error setting file timestamp: %v\n", err)
@@ -199,7 +199,7 @@ func Goptimize(file string) {
 				return
 			}
 
-			if preserveModificationTimes {
+			if preserveModTimes {
 				// transfer original modification times
 				if err := os.Chtimes(dstFile, atime, mtime); err != nil {
 					fmt.Printf("Error setting file timestamp: %v\n", err)
