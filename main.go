@@ -10,26 +10,27 @@ import (
 )
 
 var (
-	quality              int
-	maxWidth             int
-	maxHeight            int
-	outputDir            string
-	skipPreserveModTimes bool
-	jpegoptim            string
-	jpegtran             string
-	optipng              string
-	pngquant             string
-	gifsicle             string
+	quality                   int
+	maxWidth                  int
+	maxHeight                 int
+	outputDir                 string
+	preserveModificationTimes bool
+	jpegoptim                 string
+	jpegtran                  string
+	optipng                   string
+	pngquant                  string
+	gifsicle                  string
 )
 
 func main() {
 	// set the default help
 	flag.Usage = func() {
-		fmt.Println("Goptimize - Resample optimized images")
+		fmt.Println("Goptimize - downscales and optimizes existing images")
 		fmt.Printf("\nUsage: %s [options] <images>\n", os.Args[0])
 		fmt.Println("\nOptions:")
 		flag.PrintDefaults()
 		fmt.Println("\nExamples:")
+		fmt.Printf("  %s image.png\n", os.Args[0])
 		fmt.Printf("  %s -m 800x800 *.jpg\n", os.Args[0])
 		fmt.Printf("  %s -o out/ -q 90 -m 1600x1600 *.jpg\n", os.Args[0])
 
@@ -46,8 +47,8 @@ func main() {
 
 	flag.IntVar(&quality, "q", 75, "Quality - JPEG only")
 	flag.StringVar(&outputDir, "o", "", "Output directory (default overwrites original)")
-	flag.BoolVar(&skipPreserveModTimes, "n", false, "Do not preserve file modification times")
-	flag.StringVar(&maxSizes, "m", "", "Scale down to a maximum width & height. Format must be <width>x<height>.")
+	flag.BoolVar(&preserveModificationTimes, "p", true, "Preserve file modification times")
+	flag.StringVar(&maxSizes, "m", "", "Downscale to a maximum width & height in pixels (<width>x<height>)")
 
 	// third-party optimizers
 	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")

@@ -154,7 +154,7 @@ func Goptimize(file string) {
 	// calculate saved percent
 	savedPercent := 100 - math.Round(float64(dstSize)/float64(srcSize)*100)
 
-	if dstSize < srcSize {
+	if savedPercent > 0 {
 		// (over)write the file - not all filesystems support
 		// cross-filesystem moving so we overwrite the original
 		out, err := os.Create(dstFile)
@@ -170,14 +170,14 @@ func Goptimize(file string) {
 			return
 		}
 
-		if !skipPreserveModTimes {
+		if preserveModificationTimes {
 			// transfer original modification times
 			if err := os.Chtimes(dstFile, atime, mtime); err != nil {
 				fmt.Printf("Error setting file timestamp: %v\n", err)
 			}
 		}
 
-		fmt.Printf("Goptimized %s (%dx%d %s->%s %v%%)\n", dstFile, resultW, resultH, ByteCountSI(srcSize), ByteCountSI(dstSize), savedPercent)
+		fmt.Printf("Goptimized %s (%dx%d %s > %s %v%%)\n", dstFile, resultW, resultH, ByteCountSI(srcSize), ByteCountSI(dstSize), savedPercent)
 	} else {
 		// If the output directory is not the same,
 		// then write a copy of the original file
@@ -199,17 +199,17 @@ func Goptimize(file string) {
 				return
 			}
 
-			if !skipPreserveModTimes {
+			if preserveModificationTimes {
 				// transfer original modification times
 				if err := os.Chtimes(dstFile, atime, mtime); err != nil {
 					fmt.Printf("Error setting file timestamp: %v\n", err)
 				}
 			}
 
-			fmt.Printf("Copied %s (%dx%d %s->%s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), ByteCountSI(srcSize), 0)
+			fmt.Printf("Copied %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), 0)
 		} else {
 			// we didn't actually change anything
-			fmt.Printf("Skipped %s (%dx%d %s->%s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), ByteCountSI(srcSize), 0)
+			fmt.Printf("Skipped %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), 0)
 		}
 	}
 
