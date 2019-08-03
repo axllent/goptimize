@@ -166,7 +166,7 @@ func Goptimize(file string) {
 		defer out.Close()
 
 		if _, err := io.Copy(out, tmpFile); err != nil {
-			fmt.Printf("Error ovewriting original file: %v\n", err)
+			fmt.Printf("Error overwriting original file: %v\n", err)
 			return
 		}
 
