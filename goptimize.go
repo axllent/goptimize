@@ -32,7 +32,7 @@ func Goptimize(file string) {
 		return
 	}
 
-	// open original, rotate if neccesary
+	// open original, rotate if necessary
 	src, err := imaging.Open(file, imaging.AutoOrientation(true))
 
 	if err != nil {
