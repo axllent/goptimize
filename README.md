@@ -51,6 +51,13 @@ Options:
 - `./goptimize -o out/ image.jpg` - optimize a JPG file and save it to `out/`
 
 
+## Install
+
+Download the appropriate binary from the [releases](https://github.com/axllent/goptimize/releases/latest), or if you have golang installed 
+```
+go get github.com/axllent/goptimize
+```
+
 
 ## TODO
 
