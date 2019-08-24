@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/axllent/gitrel"
+	"github.com/spf13/pflag"
 )
 
 var (
@@ -26,11 +26,15 @@ var (
 )
 
 func main() {
+	// set up new flag instance
+	flag := pflag.NewFlagSet(os.Args[0], pflag.ExitOnError)
+
 	// set the default help
 	flag.Usage = func() {
 		fmt.Println("Goptimize - downscales and optimizes images")
 		fmt.Printf("\nUsage: %s [options] <images>\n", os.Args[0])
 		fmt.Println("\nOptions:")
+		flag.SortFlags = false
 		flag.PrintDefaults()
 		fmt.Println("\nExamples:")
 		fmt.Printf("  %s image.png\n", os.Args[0])
@@ -47,24 +51,27 @@ func main() {
 	}
 
 	var maxSizes string
-	var update, showversion bool
+	var update, showversion, showhelp bool
 
-	flag.IntVar(&quality, "q", 75, "quality - JPEG only")
-	flag.StringVar(&outputDir, "o", "", "output directory (default overwrites original)")
-	flag.BoolVar(&preserveModTimes, "p", true, "preserve file modification times")
-	flag.StringVar(&maxSizes, "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
-	flag.BoolVar(&update, "u", false, "update to latest release")
-	flag.BoolVar(&showversion, "v", false, "show version number")
+	flag.IntVarP(&quality, "quality", "q", 75, "quality, JPEG only")
+	flag.StringVarP(&maxSizes, "max", "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
+	flag.StringVarP(&outputDir, "out", "o", "", "output directory (default overwrites original)")
+	flag.BoolVarP(&preserveModTimes, "preserve", "p", true, "preserve file modification times")
+	flag.BoolVarP(&update, "update", "u", false, "update to latest release")
+	flag.BoolVarP(&showversion, "version", "v", false, "show version number")
+	flag.BoolVarP(&showhelp, "help", "h", false, "show help")
 
 	// third-party optimizers
-	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
-	flag.StringVar(&jpegoptim, "jpegoptim", "jpegoptim", "jpegoptim binary")
 	flag.StringVar(&jpegtran, "jpegtran", "jpegtran", "jpegtran binary")
-	flag.StringVar(&optipng, "optipng", "optipng", "optipng binary")
+	flag.StringVar(&jpegoptim, "jpegoptim", "jpegoptim", "jpegoptim binary")
+	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
 	flag.StringVar(&pngquant, "pngquant", "pngquant", "pngquant binary")
+	flag.StringVar(&optipng, "optipng", "optipng", "optipng binary")
 
-	// parse flags
-	flag.Parse()
+	flag.SortFlags = false
+
+	// parse args excluding os.Args[0]
+	flag.Parse(os.Args[1:])
 
 	// detect optimizer paths
 	gifsicle, _ = exec.LookPath(gifsicle)
@@ -72,6 +79,11 @@ func main() {
 	jpegtran, _ = exec.LookPath(jpegtran)
 	optipng, _ = exec.LookPath(optipng)
 	pngquant, _ = exec.LookPath(pngquant)
+
+	if showhelp {
+		flag.Usage()
+		os.Exit(1)
+	}
 
 	if showversion {
 		fmt.Println(fmt.Sprintf("Version: %s", version))
@@ -88,7 +100,7 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Printf("Updated %s to version %s", os.Args[0], rel)
+		fmt.Printf("Updated %s to version %s\n", os.Args[0], rel)
 		return
 	}
 
