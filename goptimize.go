@@ -116,19 +116,19 @@ func Goptimize(file string) {
 	if format.String() == "JPEG" {
 		// run one or the other, running both has no advantage
 		if jpegtran != "" {
-			RunOptimiser(tmpFilename, true, jpegtran, "-optimize", "-outfile")
+			RunOptimizer(tmpFilename, true, jpegtran, "-optimize", "-outfile")
 		} else if jpegoptim != "" {
-			RunOptimiser(tmpFilename, false, jpegoptim, "-f", "-s", "-o")
+			RunOptimizer(tmpFilename, false, jpegoptim, "-f", "-s", "-o")
 		}
 	} else if format.String() == "PNG" {
 		if pngquant != "" {
-			RunOptimiser(tmpFilename, true, pngquant, "-f", "--output")
+			RunOptimizer(tmpFilename, true, pngquant, "-f", "--output")
 		}
 		if optipng != "" {
-			RunOptimiser(tmpFilename, true, optipng, "-out")
+			RunOptimizer(tmpFilename, true, optipng, "-out")
 		}
 	} else if format.String() == "GIF" && gifsicle != "" {
-		RunOptimiser(tmpFilename, true, gifsicle, "-o")
+		RunOptimizer(tmpFilename, true, gifsicle, "-o")
 	}
 
 	// re-open modified temporary file
@@ -215,9 +215,9 @@ func Goptimize(file string) {
 
 }
 
-// RunOptimiser will run the specified command on a copy of the temporary file,
+// RunOptimizer will run the specified command on a copy of the temporary file,
 // and overwrite it if the output is smaller than the original
-func RunOptimiser(src string, outFileArg bool, args ...string) {
+func RunOptimizer(src string, outFileArg bool, args ...string) {
 	// create a new temp file
 	tmpFile, err := ioutil.TempFile(os.TempDir(), "Goptimized-")
 
