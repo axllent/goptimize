@@ -53,7 +53,7 @@ func main() {
 	var maxSizes string
 	var update, showversion, showhelp bool
 
-	flag.IntVarP(&quality, "quality", "q", 75, "quality - JPEG only")
+	flag.IntVarP(&quality, "quality", "q", 75, "quality, JPEG only")
 	flag.StringVarP(&maxSizes, "max", "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
 	flag.StringVarP(&outputDir, "out", "o", "", "output directory (default overwrites original)")
 	flag.BoolVarP(&preserveModTimes, "preserve", "p", true, "preserve file modification times")
@@ -62,11 +62,11 @@ func main() {
 	flag.BoolVarP(&showhelp, "help", "h", false, "show help")
 
 	// third-party optimizers
-	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
-	flag.StringVar(&jpegoptim, "jpegoptim", "jpegoptim", "jpegoptim binary")
 	flag.StringVar(&jpegtran, "jpegtran", "jpegtran", "jpegtran binary")
-	flag.StringVar(&optipng, "optipng", "optipng", "optipng binary")
+	flag.StringVar(&jpegoptim, "jpegoptim", "jpegoptim", "jpegoptim binary")
+	flag.StringVar(&gifsicle, "gifsicle", "gifsicle", "gifsicle binary")
 	flag.StringVar(&pngquant, "pngquant", "pngquant", "pngquant binary")
+	flag.StringVar(&optipng, "optipng", "optipng", "optipng binary")
 
 	flag.SortFlags = false
 
