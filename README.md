@@ -1,5 +1,7 @@
 # Goptimizer - downscales and optimizes images
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/axllent/goptimize)](https://goreportcard.com/report/github.com/axllent/goptimize)
+
 Goptimizer is a commandline utility written in Golang. It downscales and optimizes JPEG, PNG and Gif files.
 
 Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see [Usage](#usage-options)), however optimization is done using the following additional tools (if they are installed):
