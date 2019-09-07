@@ -14,15 +14,15 @@ Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see 
 
 ## Notes
 
-Both `jpegoptim` & `jpegtran` have almost identical optimization, so if both are installed then just `jpegtran` is used for JPG optimization. PNG optimization however will run through both `optipng` & `pngquant` (if installed) as this has definite advantages.
+Both `jpegoptim` & `jpegtran` have almost identical optimization, so if both are installed then just `jpegtran` is used for JPG optimization. PNG optimization however will run through both `optipng` & `pngquant` (if installed) as this can result in better optimization.
 
 It is highly recommended to install the necessary optimization tools, however they are not required to run goptimize.
 
-Goptimize will remove all exif data from JPEG files, auto-rotating those that relied on it.
+Goptimize will remove all exif data from JPEG files, auto-rotating those that depend on it for orientation.
 
 It will also preserve (by default) the file's original modification times (`-p=false` to disable).
 
-Animated GIF files are not supported an automatically get skipped.
+Animated GIF files are not supported and automatically get skipped.
 
 
 ## Usage options
