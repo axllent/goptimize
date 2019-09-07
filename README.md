@@ -2,12 +2,11 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/axllent/goptimize)](https://goreportcard.com/report/github.com/axllent/goptimize)
 
-Goptimizer is a commandline utility written in Golang. It downscales and optimizes JPEG, PNG and Gif files.
+Goptimizer is a commandline utility written in Golang. It downscales and optimizes JPEG, PNG, GIF, TIFF and BMP files.
 
 Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see [Usage](#usage-options)), however optimization is done using the following additional tools (if they are installed):
 
-- jpegoptim
-- jpegtran (`libjpeg-turbo-progs`)
+- jpegtran (`libjpeg-turbo-progs`) or jpegoptim
 - optipng
 - pngquant
 - gifsicle
@@ -22,6 +21,8 @@ It is highly recommended to install the necessary optimization tools, however th
 Goptimize will remove all exif data from JPEG files, auto-rotating those that relied on it.
 
 It will also preserve (by default) the file's original modification times (`-p=false` to disable).
+
+Animated GIF files are not supported an automatically get skipped.
 
 
 ## Usage options
