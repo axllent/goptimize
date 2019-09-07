@@ -22,13 +22,12 @@ func Goptimize(file string) {
 	info, err := os.Stat(file)
 
 	if err != nil {
-		fmt.Printf("%s doesn't exist\n", file)
+		fmt.Printf("Error: %s doesn't exist\n", file)
 		return
 	}
 
 	if !info.Mode().IsRegular() {
-		// not a file
-		fmt.Printf("%s is not a file\n", file)
+		fmt.Printf("Error: %s is not a file\n", file)
 		return
 	}
 
@@ -36,15 +35,23 @@ func Goptimize(file string) {
 	src, err := imaging.Open(file, imaging.AutoOrientation(true))
 
 	if err != nil {
-		fmt.Printf("%v (%s)\n", err, file)
+		fmt.Printf("Error: %v (%s)\n", err, file)
 		return
 	}
 
 	format, err := imaging.FormatFromFilename(file)
 
 	if err != nil {
-		fmt.Printf("Cannot detect format: %v\n", err)
+		fmt.Printf("Error: cannot detect format: %v\n", err)
 		return
+	}
+
+	if format.String() == "GIF" {
+		// return if GIF is animated - unsupported
+		if err := IsGIFAnimated(file); err != nil {
+			fmt.Printf("Error: animated GIF not supported (%v)\n", file)
+			return
+		}
 	}
 
 	outFilename := filepath.Base(file)
@@ -60,7 +67,7 @@ func Goptimize(file string) {
 	srcW := srcBounds.Dx()
 	srcH := srcBounds.Dy()
 
-	// Ensure scaling does not upscale image
+	// do not upscale image
 	imgMaxW := maxWidth
 	if imgMaxW == 0 || imgMaxW > srcW {
 		imgMaxW = srcW
@@ -79,24 +86,25 @@ func Goptimize(file string) {
 	tmpFile, err := ioutil.TempFile(os.TempDir(), "Goptimized-")
 
 	if err != nil {
-		fmt.Printf("Cannot create temporary file: %v\n", err)
+		fmt.Printf("Error: cannot create temporary file: %v\n", err)
 		return
 	}
 
 	defer os.Remove(tmpFile.Name())
 
-	if format.String() == "JPEG" {
+	switch imgType := format.String(); imgType {
+	case "JPEG":
 		err = jpeg.Encode(tmpFile, resized, &jpeg.Options{Quality: quality})
-	} else if format.String() == "PNG" {
+	case "PNG":
 		err = png.Encode(tmpFile, resized)
-	} else if format.String() == "GIF" {
+	case "GIF":
 		err = gif.Encode(tmpFile, resized, nil)
-	} else if format.String() == "TIFF" {
+	case "TIFF":
 		err = tiff.Encode(tmpFile, resized, nil)
-	} else if format.String() == "BMP" {
+	case "BMP":
 		err = bmp.Encode(tmpFile, resized)
-	} else {
-		fmt.Printf("Unsupported file type %s\n", file)
+	default:
+		fmt.Printf("Error: unsupported file type (%s)\n", file)
 		return
 	}
 
@@ -112,7 +120,7 @@ func Goptimize(file string) {
 	// so we can modify it with system processes
 	tmpFile.Close()
 
-	// Run through optimizers
+	// run through optimizers
 	if format.String() == "JPEG" {
 		// run one or the other, running both has no advantage
 		if jpegtran != "" {
@@ -179,7 +187,7 @@ func Goptimize(file string) {
 
 		fmt.Printf("Goptimized %s (%dx%d %s > %s %v%%)\n", dstFile, resultW, resultH, ByteCountSI(srcSize), ByteCountSI(dstSize), savedPercent)
 	} else {
-		// If the output directory is not the same,
+		// if the output directory is not the same,
 		// then write a copy of the original file
 		if outputDir != "" {
 			out, err := os.Create(dstFile)
@@ -288,4 +296,22 @@ func ByteCountSI(b int64) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f%cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+// IsGIFAnimated will return an error if the GIF file has more than 1 frame
+func IsGIFAnimated(gifFile string) error {
+	file, _ := os.Open(gifFile)
+	defer file.Close()
+
+	g, err := gif.DecodeAll(file)
+	if err != nil {
+		return err
+	}
+
+	// Single frame = OK
+	if len(g.Image) == 1 {
+		return nil
+	}
+
+	return fmt.Errorf("Animated gif")
 }
