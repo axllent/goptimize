@@ -1,5 +1,10 @@
 # Changelog
 
+## [dev]
+
+- Switch to go mods - go (>= 1.11 required)
+
+
 ## [0.0.3]
 
 - Detect & skip animated GIFs

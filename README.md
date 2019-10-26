@@ -57,10 +57,15 @@ Options:
 ## Install
 
 Download the appropriate binary from the [releases](https://github.com/axllent/goptimize/releases/latest), or if you have golang installed 
+
+
+### Build requirements
+
+Go >= 1.11 required.
+
 ```
 go get github.com/axllent/goptimize
 ```
-
 
 ## TODO
 
