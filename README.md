@@ -2,12 +2,11 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/axllent/goptimize)](https://goreportcard.com/report/github.com/axllent/goptimize)
 
-Goptimizer is a commandline utility written in Golang. It downscales and optimizes JPEG, PNG and Gif files.
+Goptimizer is a commandline utility written in Golang. It downscales and optimizes JPEG, PNG, GIF, TIFF and BMP files.
 
 Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see [Usage](#usage-options)), however optimization is done using the following additional tools (if they are installed):
 
-- jpegoptim
-- jpegtran (`libjpeg-turbo-progs`)
+- jpegtran (`libjpeg-turbo-progs`) or jpegoptim
 - optipng
 - pngquant
 - gifsicle
@@ -15,13 +14,15 @@ Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see 
 
 ## Notes
 
-Both `jpegoptim` & `jpegtran` have almost identical optimization, so if both are installed then just `jpegtran` is used for JPG optimization. PNG optimization however will run through both `optipng` & `pngquant` (if installed) as this has definite advantages.
+Both `jpegoptim` & `jpegtran` have almost identical optimization, so if both are installed then just `jpegtran` is used for JPG optimization. PNG optimization however will run through both `optipng` & `pngquant` (if installed) as this can result in better optimization.
 
 It is highly recommended to install the necessary optimization tools, however they are not required to run goptimize.
 
-Goptimize will remove all exif data from JPEG files, auto-rotating those that relied on it.
+Goptimize will remove all exif data from JPEG files, auto-rotating those that depend on it for orientation.
 
 It will also preserve (by default) the file's original modification times (`-p=false` to disable).
+
+Animated GIF files are not supported and automatically get skipped.
 
 
 ## Usage options
@@ -56,10 +57,15 @@ Options:
 ## Install
 
 Download the appropriate binary from the [releases](https://github.com/axllent/goptimize/releases/latest), or if you have golang installed 
+
+
+### Build requirements
+
+Go >= 1.11 required.
+
 ```
 go get github.com/axllent/goptimize
 ```
-
 
 ## TODO
 
