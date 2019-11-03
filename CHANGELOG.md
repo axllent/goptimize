@@ -3,6 +3,7 @@
 ## [dev]
 
 - Switch to go mods - go (>= 1.11 required)
+- Switch to axllent/semver for app updating
 
 
 ## [0.0.3]
