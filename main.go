@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/axllent/gitrel"
+	"github.com/axllent/ghru"
 	"github.com/spf13/pflag"
 )
 
@@ -87,15 +87,15 @@ func main() {
 
 	if showversion {
 		fmt.Println(fmt.Sprintf("Version: %s", version))
-		latest, _, _, err := gitrel.Latest("axllent/goptimize", "goptimize")
-		if err == nil && latest != version {
+		latest, _, _, err := ghru.Latest("axllent/goptimize", "goptimize")
+		if err == nil && ghru.GreaterThan(latest, version) {
 			fmt.Printf("Update available: %s\nRun `%s -u` to update.\n", latest, os.Args[0])
 		}
 		return
 	}
 
 	if update {
-		rel, err := gitrel.Update("axllent/goptimize", "goptimize", version)
+		rel, err := ghru.Update("axllent/goptimize", "goptimize", version)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
