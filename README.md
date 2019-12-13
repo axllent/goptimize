@@ -35,6 +35,7 @@ Options:
   -m, --max string         downscale to a maximum width & height in pixels (<width>x<height>)
   -o, --out string         output directory (default overwrites original)
   -p, --preserve           preserve file modification times (default true)
+  -t, --threaded           run multi-threaded (use all CPU cores)
   -u, --update             update to latest release
   -v, --version            show version number
   -h, --help               show help

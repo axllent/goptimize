@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
+	"sync"
 
 	"github.com/axllent/ghru"
 	"github.com/spf13/pflag"
@@ -22,6 +24,7 @@ var (
 	optipng          string
 	pngquant         string
 	gifsicle         string
+	threads          = 1
 	version          = "dev"
 )
 
@@ -51,13 +54,14 @@ func main() {
 	}
 
 	var maxSizes string
-	var update, showversion, showhelp bool
+	var multiThreaded, update, showversion, showhelp bool
 
 	flag.IntVarP(&quality, "quality", "q", 75, "quality, JPEG only")
 	flag.StringVarP(&maxSizes, "max", "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
 	flag.StringVarP(&outputDir, "out", "o", "", "output directory (default overwrites original)")
 	flag.BoolVarP(&preserveModTimes, "preserve", "p", true, "preserve file modification times")
 	flag.BoolVarP(&update, "update", "u", false, "update to latest release")
+	flag.BoolVarP(&multiThreaded, "threaded", "t", false, "run multi-threaded (use all CPU cores)")
 	flag.BoolVarP(&showversion, "version", "v", false, "show version number")
 	flag.BoolVarP(&showhelp, "help", "h", false, "show help")
 
@@ -137,9 +141,34 @@ func main() {
 		}
 	}
 
-	for _, img := range args {
-		Goptimize(img)
+	if multiThreaded {
+		threads = runtime.NumCPU()
 	}
+
+	processChan := make(chan string)
+
+	wg := &sync.WaitGroup{} // Signal to main goroutine that worker goroutines are working/done working
+	wg.Add(threads)
+
+	for i := 0; i < threads; i++ {
+		go func() {
+			for nextFile := range processChan {
+				Goptimize(nextFile)
+			}
+			// Channel was closed, so we finished this goroutine.
+			wg.Done() // Let main goroutine know we are done.
+		}()
+	}
+
+	for _, img := range args {
+		processChan <- img
+	}
+
+	// Close the channel.  This tells the worker goroutines that they can be done.
+	close(processChan)
+
+	// Wait for all worker goroutines to finish processing the IPs
+	wg.Wait()
 }
 
 // displayDelectedOptimizer prints whether the optimizer was found
