@@ -1,6 +1,6 @@
 # Changelog
 
-## [dev]
+## [0.2.0]
 
 - Add threaded option (`-t`) to use all CPU cores
 
