@@ -1,5 +1,10 @@
 # Changelog
 
+## [dev]
+
+- Add threaded option (`-t`) to use all CPU cores
+
+
 ## [0.1.0]
 
 - Switch to go mods - go (>= 1.11 required)
