@@ -45,12 +45,12 @@ func main() {
 		fmt.Printf("  %s -o out/ -q 90 -m 1600x1600 *.jpg\n", os.Args[0])
 
 		fmt.Println("\nDetected optimizers:")
-		if err := displayDelectedOptimizer("jpegtran ", jpegtran); err != nil {
-			displayDelectedOptimizer("jpegoptim", jpegoptim)
+		if err := displayDetectedOptimizer("jpegtran ", jpegtran); err != nil {
+			displayDetectedOptimizer("jpegoptim", jpegoptim)
 		}
-		displayDelectedOptimizer("optipng  ", optipng)
-		displayDelectedOptimizer("pngquant ", pngquant)
-		displayDelectedOptimizer("gifsicle ", gifsicle)
+		displayDetectedOptimizer("optipng  ", optipng)
+		displayDetectedOptimizer("pngquant ", pngquant)
+		displayDetectedOptimizer("gifsicle ", gifsicle)
 	}
 
 	var maxSizes string
@@ -171,8 +171,8 @@ func main() {
 	wg.Wait()
 }
 
-// displayDelectedOptimizer prints whether the optimizer was found
-func displayDelectedOptimizer(name, bin string) error {
+// displayDetectedOptimizer prints whether the optimizer was found
+func displayDetectedOptimizer(name, bin string) error {
 	exe, err := exec.LookPath(bin)
 	if err != nil {
 		return err
