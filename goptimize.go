@@ -6,7 +6,6 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"os/exec"
@@ -83,7 +82,7 @@ func Goptimize(file string) {
 	resultW := dstBounds.Dx()
 	resultH := dstBounds.Dy()
 
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "Goptimized-")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "Goptimized-")
 
 	if err != nil {
 		fmt.Printf("Error: cannot create temporary file: %v\n", err)
@@ -227,7 +226,7 @@ func Goptimize(file string) {
 // and overwrite it if the output is smaller than the original
 func RunOptimizer(src string, outFileArg bool, args ...string) {
 	// create a new temp file
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "Goptimized-")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "Goptimized-")
 
 	if err != nil {
 		fmt.Printf("Cannot create temporary file: %v\n", err)
