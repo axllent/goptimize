@@ -24,6 +24,7 @@ var (
 	optipng          string
 	pngquant         string
 	gifsicle         string
+	copyExif         bool
 	threads          = 1
 	version          = "dev"
 )
@@ -60,6 +61,7 @@ func main() {
 	flag.StringVarP(&maxSizes, "max", "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
 	flag.StringVarP(&outputDir, "out", "o", "", "output directory (default overwrites original)")
 	flag.BoolVarP(&preserveModTimes, "preserve", "p", true, "preserve file modification times")
+	flag.BoolVarP(&copyExif, "exif", "e", false, "copy exif data")
 	flag.BoolVarP(&update, "update", "u", false, "update to latest release")
 	flag.BoolVarP(&multiThreaded, "threaded", "t", false, "run multi-threaded (use all CPU cores)")
 	flag.BoolVarP(&showversion, "version", "v", false, "show version number")
