@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.2]
+
+- Optionally preserve exif data for supported formats
+- Update Go modules
+
+
 ## [0.2.1]
 
 - Update core modules
