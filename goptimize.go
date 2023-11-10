@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
@@ -30,12 +31,21 @@ func Goptimize(file string) {
 		return
 	}
 
-	// open original, rotate if necessary
-	src, err := imaging.Open(file, imaging.AutoOrientation(true))
+	var src image.Image
 
-	if err != nil {
-		fmt.Printf("Error: %v (%s)\n", err, file)
-		return
+	if !copyExif {
+		// rotate if necessary
+		src, err = imaging.Open(file, imaging.AutoOrientation(true))
+		if err != nil {
+			fmt.Printf("Error: %v (%s)\n", err, file)
+			return
+		}
+	} else {
+		src, err = imaging.Open(file)
+		if err != nil {
+			fmt.Printf("Error: %v (%s)\n", err, file)
+			return
+		}
 	}
 
 	format, err := imaging.FormatFromFilename(file)
@@ -126,6 +136,13 @@ func Goptimize(file string) {
 			RunOptimizer(tmpFilename, true, jpegtran, "-optimize", "-outfile")
 		} else if jpegoptim != "" {
 			RunOptimizer(tmpFilename, false, jpegoptim, "-f", "-s", "-o")
+		}
+
+		if copyExif {
+			if err := exifCopy(file, tmpFilename); err != nil {
+				fmt.Printf("Error copying exif data: %v (%s)\n", err, file)
+				return
+			}
 		}
 	} else if format.String() == "PNG" {
 		if pngquant != "" {
