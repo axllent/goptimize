@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/tiff"
 )
