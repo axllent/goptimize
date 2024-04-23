@@ -62,7 +62,7 @@ Download the appropriate binary from the [releases](https://github.com/axllent/g
 
 ### Build requirements
 
-Go >= 1.11 required.
+Go >= 1.21 required.
 
 ```
 go get github.com/axllent/goptimize

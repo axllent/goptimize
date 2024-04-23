@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.3]
+
+- Switch to kovidgoyal/imaging to address CVE-2023-36308
+
+
 ## [0.2.2]
 
 - Optionally preserve exif data for supported formats
