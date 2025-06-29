@@ -115,21 +115,21 @@ func copyMetadata(outImagePath, imagePath, metadataImagePath string) error {
 	if err != nil {
 		return err
 	}
-	defer outFile.Close()
+	defer func() { _ = outFile.Close() }()
 	writer := bufio.NewWriter(outFile)
 
 	imageFile, err := os.Open(imagePath)
 	if err != nil {
 		return err
 	}
-	defer imageFile.Close()
+	defer func() { _ = imageFile.Close() }()
 	imageReader := bufio.NewReader(imageFile)
 
 	metaFile, err := os.Open(metadataImagePath)
 	if err != nil {
 		return err
 	}
-	defer metaFile.Close()
+	defer func() { _ = metaFile.Close() }()
 	metaReader := bufio.NewReader(metaFile)
 
 	_, err = writer.Write([]byte{0xFF, soi})
@@ -166,6 +166,6 @@ func exifCopy(fromPath, toPath string) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(copyPath)
+	defer func() { _ = os.Remove(copyPath) }()
 	return copyMetadata(toPath, copyPath, fromPath)
 }

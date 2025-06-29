@@ -18,7 +18,7 @@ import (
 )
 
 // Goptimize downscales and optimizes an existing image
-func Goptimize(file string) {
+func goptimize(file string) {
 	info, err := os.Stat(file)
 
 	if err != nil {
@@ -57,7 +57,7 @@ func Goptimize(file string) {
 
 	if format.String() == "GIF" {
 		// return if GIF is animated - unsupported
-		if err := IsGIFAnimated(file); err != nil {
+		if err := isGIFAnimated(file); err != nil {
 			fmt.Printf("Error: animated GIF not supported (%v)\n", file)
 			return
 		}
@@ -99,7 +99,7 @@ func Goptimize(file string) {
 		return
 	}
 
-	defer os.Remove(tmpFile.Name())
+	defer func() { _ = os.Remove(tmpFile.Name()) }()
 
 	switch imgType := format.String(); imgType {
 	case "JPEG":
@@ -127,15 +127,18 @@ func Goptimize(file string) {
 
 	// immediately close the temp file to release pointers
 	// so we can modify it with system processes
-	tmpFile.Close()
+	if err := tmpFile.Close(); err != nil {
+		fmt.Printf("Error closing temporary file: %v\n", err)
+		return
+	}
 
 	// run through optimizers
 	if format.String() == "JPEG" {
 		// run one or the other, running both has no advantage
 		if jpegtran != "" {
-			RunOptimizer(tmpFilename, true, jpegtran, "-optimize", "-outfile")
+			runOptimizer(tmpFilename, true, jpegtran, "-optimize", "-outfile")
 		} else if jpegoptim != "" {
-			RunOptimizer(tmpFilename, false, jpegoptim, "-f", "-s", "-o")
+			runOptimizer(tmpFilename, false, jpegoptim, "-f", "-s", "-o")
 		}
 
 		if copyExif {
@@ -146,13 +149,13 @@ func Goptimize(file string) {
 		}
 	} else if format.String() == "PNG" {
 		if pngquant != "" {
-			RunOptimizer(tmpFilename, true, pngquant, "-f", "--output")
+			runOptimizer(tmpFilename, true, pngquant, "-f", "--output")
 		}
 		if optipng != "" {
-			RunOptimizer(tmpFilename, true, optipng, "-out")
+			runOptimizer(tmpFilename, true, optipng, "-out")
 		}
 	} else if format.String() == "GIF" && gifsicle != "" {
-		RunOptimizer(tmpFilename, true, gifsicle, "-o")
+		runOptimizer(tmpFilename, true, gifsicle, "-o")
 	}
 
 	// re-open modified temporary file
@@ -162,7 +165,7 @@ func Goptimize(file string) {
 		return
 	}
 
-	defer tmpFile.Close()
+	defer func() { _ = tmpFile.Close() }()
 
 	// get th eoriginal file stats
 	srcStat, _ := os.Stat(file)
@@ -187,7 +190,7 @@ func Goptimize(file string) {
 			return
 		}
 
-		defer out.Close()
+		defer func() { _ = out.Close() }()
 
 		if _, err := io.Copy(out, tmpFile); err != nil {
 			fmt.Printf("Error overwriting original file: %v\n", err)
@@ -201,22 +204,26 @@ func Goptimize(file string) {
 			}
 		}
 
-		fmt.Printf("Goptimized %s (%dx%d %s > %s %v%%)\n", dstFile, resultW, resultH, ByteCountSI(srcSize), ByteCountSI(dstSize), savedPercent)
+		fmt.Printf("Optimized %s (%dx%d %s > %s %v%%)\n", dstFile, resultW, resultH, byteCountSI(srcSize), byteCountSI(dstSize), savedPercent)
 	} else {
 		// if the output directory is not the same,
 		// then write a copy of the original file
 		if outputDir != "" {
 			out, err := os.Create(dstFile)
 			if err != nil {
+				fmt.Printf("Error creating new file: %v\n", err)
+				return
+			}
+
+			defer func() { _ = out.Close() }()
+
+			orig, err := os.Open(file)
+			if err != nil {
 				fmt.Printf("Error opening original file: %v\n", err)
 				return
 			}
 
-			defer out.Close()
-
-			orig, _ := os.Open(file)
-
-			defer orig.Close()
+			defer func() { _ = orig.Close() }()
 
 			if _, err := io.Copy(out, orig); err != nil {
 				fmt.Printf("Error ovewriting original file: %v\n", err)
@@ -230,36 +237,35 @@ func Goptimize(file string) {
 				}
 			}
 
-			fmt.Printf("Copied %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), 0)
+			fmt.Printf("Copied %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, byteCountSI(srcSize), 0)
 		} else {
 			// we didn't actually change anything
-			fmt.Printf("Skipped %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, ByteCountSI(srcSize), 0)
+			fmt.Printf("Skipped %s (%dx%d %s %v%%)\n", dstFile, srcW, srcH, byteCountSI(srcSize), 0)
 		}
 	}
 
 }
 
-// RunOptimizer will run the specified command on a copy of the temporary file,
+// runOptimizer will run the specified command on a copy of the temporary file,
 // and overwrite it if the output is smaller than the original
-func RunOptimizer(src string, outFileArg bool, args ...string) {
+func runOptimizer(src string, outFileArg bool, args ...string) {
 	// create a new temp file
-	tmpFile, err := os.CreateTemp(os.TempDir(), "Goptimized-")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "goptimize-")
 
 	if err != nil {
 		fmt.Printf("Cannot create temporary file: %v\n", err)
 		return
 	}
 
-	defer os.Remove(tmpFile.Name())
+	defer func() { _ = os.Remove(tmpFile.Name()) }()
 
 	source, err := os.Open(src)
-
 	if err != nil {
 		fmt.Printf("Cannot open temporary file: %v\n", err)
 		return
 	}
 
-	defer source.Close()
+	defer func() { _ = source.Close() }()
 
 	if _, err := io.Copy(tmpFile, source); err != nil {
 		fmt.Printf("Cannot copy source file: %v\n", err)
@@ -289,8 +295,8 @@ func RunOptimizer(src string, outFileArg bool, args ...string) {
 	dstSize := dstStat.Size()
 
 	// ensure file pointers are closed before renaming
-	tmpFile.Close()
-	source.Close()
+	func() { _ = tmpFile.Close() }()
+	func() { _ = source.Close() }()
 
 	if dstSize < srcSize {
 		if err := os.Rename(tmpFilename, src); err != nil {
@@ -301,7 +307,7 @@ func RunOptimizer(src string, outFileArg bool, args ...string) {
 }
 
 // ByteCountSI returns a human readable size from int64 bytes
-func ByteCountSI(b int64) string {
+func byteCountSI(b int64) string {
 	const unit = 1000
 	if b < unit {
 		return fmt.Sprintf("%dB", b)
@@ -315,9 +321,12 @@ func ByteCountSI(b int64) string {
 }
 
 // IsGIFAnimated will return an error if the GIF file has more than 1 frame
-func IsGIFAnimated(gifFile string) error {
-	file, _ := os.Open(gifFile)
-	defer file.Close()
+func isGIFAnimated(gifFile string) error {
+	file, err := os.Open(gifFile)
+	if err != nil {
+		return fmt.Errorf("cannot open GIF file: %v", err)
+	}
+	defer func() { _ = file.Close() }()
 
 	g, err := gif.DecodeAll(file)
 	if err != nil {
@@ -329,5 +338,5 @@ func IsGIFAnimated(gifFile string) error {
 		return nil
 	}
 
-	return fmt.Errorf("Animated gif")
+	return fmt.Errorf("cannot optimize an animated gif")
 }

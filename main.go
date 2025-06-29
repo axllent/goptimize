@@ -55,11 +55,11 @@ func main() {
 
 		fmt.Println("\nDetected optimizers:")
 		if err := displayDetectedOptimizer("jpegtran ", jpegtran); err != nil {
-			displayDetectedOptimizer("jpegoptim", jpegoptim)
+			_ = displayDetectedOptimizer("jpegoptim", jpegoptim)
 		}
-		displayDetectedOptimizer("optipng  ", optipng)
-		displayDetectedOptimizer("pngquant ", pngquant)
-		displayDetectedOptimizer("gifsicle ", gifsicle)
+		_ = displayDetectedOptimizer("optipng  ", optipng)
+		_ = displayDetectedOptimizer("pngquant ", pngquant)
+		_ = displayDetectedOptimizer("gifsicle ", gifsicle)
 	}
 
 	var maxSizes string
@@ -85,7 +85,9 @@ func main() {
 	flag.SortFlags = false
 
 	// parse args excluding os.Args[0]
-	flag.Parse(os.Args[1:])
+	if err := flag.Parse(os.Args[1:]); err != nil {
+		fmt.Printf("Error parsing flags: %s\n", err.Error())
+	}
 
 	// detect optimizer paths
 	gifsicle, _ = exec.LookPath(gifsicle)
@@ -179,7 +181,7 @@ func main() {
 	for i := 0; i < threads; i++ {
 		go func() {
 			for nextFile := range processChan {
-				Goptimize(nextFile)
+				goptimize(nextFile)
 			}
 			// Channel was closed, so we finished this goroutine.
 			wg.Done() // Let main goroutine know we are done.
