@@ -1,14 +1,14 @@
 module github.com/axllent/goptimize
 
-go 1.21
+go 1.23.0
 
-toolchain go1.22.2
+toolchain go1.23.1
 
 require (
-	github.com/axllent/ghru v1.2.1
-	github.com/kovidgoyal/imaging v1.6.3
-	github.com/spf13/pflag v1.0.5
-	golang.org/x/image v0.15.0
+	github.com/axllent/ghru/v2 v2.0.1
+	github.com/kovidgoyal/imaging v1.6.4
+	github.com/spf13/pflag v1.0.6
+	golang.org/x/image v0.28.0
 )
 
-require github.com/axllent/semver v0.0.1 // indirect
+require golang.org/x/mod v0.25.0 // indirect
