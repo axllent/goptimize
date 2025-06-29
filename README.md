@@ -2,7 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/axllent/goptimize)](https://goreportcard.com/report/github.com/axllent/goptimize)
 
-Goptimize is a command-line utility written in Golang. It downscales and optimizes JPEG, PNG, GIF, TIFF and BMP files.
+Goptimize is a command-line utility written in Go. It downscales and optimizes JPEG, PNG, GIF, TIFF and BMP files.
 
 Image downscaling/rotation is done within goptimize (`-m <width>x<height>`, see [Usage](#usage-options)), however optimization is done using the following additional tools (if they are installed):
 
