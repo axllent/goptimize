@@ -1,3 +1,4 @@
+// Package main is the main application
 package main
 
 import (
@@ -9,7 +10,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/axllent/ghru"
+	"github.com/axllent/ghru/v2"
 	"github.com/spf13/pflag"
 )
 
@@ -27,6 +28,13 @@ var (
 	copyExif         bool
 	threads          = 1
 	version          = "dev"
+	// ghruConf is the configuration for the ghru package
+	ghruConf = ghru.Config{
+		Repo:           "axllent/goptimize",
+		ArchiveName:    "goptimize-{{.OS}}-{{.Arch}}",
+		BinaryName:     "goptimize",
+		CurrentVersion: version,
+	}
 )
 
 func main() {
@@ -47,15 +55,15 @@ func main() {
 
 		fmt.Println("\nDetected optimizers:")
 		if err := displayDetectedOptimizer("jpegtran ", jpegtran); err != nil {
-			displayDetectedOptimizer("jpegoptim", jpegoptim)
+			_ = displayDetectedOptimizer("jpegoptim", jpegoptim)
 		}
-		displayDetectedOptimizer("optipng  ", optipng)
-		displayDetectedOptimizer("pngquant ", pngquant)
-		displayDetectedOptimizer("gifsicle ", gifsicle)
+		_ = displayDetectedOptimizer("optipng  ", optipng)
+		_ = displayDetectedOptimizer("pngquant ", pngquant)
+		_ = displayDetectedOptimizer("gifsicle ", gifsicle)
 	}
 
 	var maxSizes string
-	var multiThreaded, update, showversion, showhelp bool
+	var multiThreaded, update, showVersion, showHelp bool
 
 	flag.IntVarP(&quality, "quality", "q", 75, "quality, JPEG only")
 	flag.StringVarP(&maxSizes, "max", "m", "", "downscale to a maximum width & height in pixels (<width>x<height>)")
@@ -64,8 +72,8 @@ func main() {
 	flag.BoolVarP(&copyExif, "exif", "e", false, "copy exif data")
 	flag.BoolVarP(&update, "update", "u", false, "update to latest release")
 	flag.BoolVarP(&multiThreaded, "threaded", "t", false, "run multi-threaded (use all CPU cores)")
-	flag.BoolVarP(&showversion, "version", "v", false, "show version number")
-	flag.BoolVarP(&showhelp, "help", "h", false, "show help")
+	flag.BoolVarP(&showVersion, "version", "v", false, "show version number")
+	flag.BoolVarP(&showHelp, "help", "h", false, "show help")
 
 	// third-party optimizers
 	flag.StringVar(&jpegtran, "jpegtran", "jpegtran", "jpegtran binary")
@@ -77,7 +85,9 @@ func main() {
 	flag.SortFlags = false
 
 	// parse args excluding os.Args[0]
-	flag.Parse(os.Args[1:])
+	if err := flag.Parse(os.Args[1:]); err != nil {
+		fmt.Printf("Error parsing flags: %s\n", err.Error())
+	}
 
 	// detect optimizer paths
 	gifsicle, _ = exec.LookPath(gifsicle)
@@ -86,28 +96,44 @@ func main() {
 	optipng, _ = exec.LookPath(optipng)
 	pngquant, _ = exec.LookPath(pngquant)
 
-	if showhelp {
+	if showHelp {
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	if showversion {
-		fmt.Println(fmt.Sprintf("Version: %s", version))
-		latest, _, _, err := ghru.Latest("axllent/goptimize", "goptimize")
-		if err == nil && ghru.GreaterThan(latest, version) {
-			fmt.Printf("Update available: %s\nRun `%s -u` to update.\n", latest, os.Args[0])
+	if showVersion {
+		fmt.Printf("Version: %s\n", version)
+
+		release, err := ghruConf.Latest()
+		if err != nil {
+			fmt.Printf("Error getting latest release: %s\n", err.Error())
+			os.Exit(1)
 		}
-		return
+
+		// The latest version is the same version
+		if release.Tag == version {
+			os.Exit(0)
+		}
+
+		// A newer release is available
+		fmt.Printf(
+			"Update available: %s\nRun `%s -u` to update (requires read/write access to install directory).\n",
+			release.Tag,
+			os.Args[0],
+		)
+		os.Exit(0)
 	}
 
 	if update {
-		rel, err := ghru.Update("axllent/goptimize", "goptimize", version)
+		// Update the app
+		rel, err := ghruConf.SelfUpdate()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		fmt.Printf("Updated %s to version %s\n", os.Args[0], rel)
-		return
+
+		fmt.Printf("Updated %s to version %s\n", os.Args[0], rel.Tag)
+		os.Exit(0)
 	}
 
 	if len(flag.Args()) < 1 {
@@ -155,7 +181,7 @@ func main() {
 	for i := 0; i < threads; i++ {
 		go func() {
 			for nextFile := range processChan {
-				Goptimize(nextFile)
+				goptimize(nextFile)
 			}
 			// Channel was closed, so we finished this goroutine.
 			wg.Done() // Let main goroutine know we are done.
