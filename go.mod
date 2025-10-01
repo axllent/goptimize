@@ -7,7 +7,7 @@ toolchain go1.23.1
 require (
 	github.com/axllent/ghru/v2 v2.0.1
 	github.com/kovidgoyal/imaging v1.6.4
-	github.com/spf13/pflag v1.0.6
+	github.com/spf13/pflag v1.0.10
 	golang.org/x/image v0.28.0
 )
 
