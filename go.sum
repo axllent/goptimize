@@ -1,5 +1,5 @@
-github.com/axllent/ghru/v2 v2.0.1 h1:/9XHbMqJRGRxlyNMq2XiHQpBLz7hlq8xCdgJ4ZhjCoM=
-github.com/axllent/ghru/v2 v2.0.1/go.mod h1:seMMjx8/0r5ZAL7c0vwTPIRoyN0AoTUqAylZEWZWGK4=
+github.com/axllent/ghru/v2 v2.0.2 h1:xalJupjJAU8Kcs39AwpG53qbcbi3+WKM98BEoQWf/zU=
+github.com/axllent/ghru/v2 v2.0.2/go.mod h1:seMMjx8/0r5ZAL7c0vwTPIRoyN0AoTUqAylZEWZWGK4=
 github.com/kovidgoyal/imaging v1.6.4 h1:K0idhRPXnRrJBKnBYcTfI1HTWSNDeAn7hYDvf9I0dCk=
 github.com/kovidgoyal/imaging v1.6.4/go.mod h1:bEIgsaZmXlvFfkv/CUxr9rJook6AQkJnpB5EPosRfRY=
 github.com/spf13/pflag v1.0.6 h1:jFzHGLGAlb3ruxLB8MhbI6A8+AQX/2eW4qeyNZXNp2o=
