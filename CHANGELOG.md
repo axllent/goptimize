@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.1]
+
+- Update Go dependencies
+- Update GitHub actions
+
 ## [1.0.0]
 
 - Use ghru/v2 for latest version checks and self-update functionality
