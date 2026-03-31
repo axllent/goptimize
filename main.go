@@ -98,7 +98,7 @@ func main() {
 
 	if showHelp {
 		flag.Usage()
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	if showVersion {
