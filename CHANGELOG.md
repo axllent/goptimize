@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2]
+
+- Update Go dependencies
+- Exit help screen with status 0
+
 ## [1.0.1]
 
 - Update Go dependencies
